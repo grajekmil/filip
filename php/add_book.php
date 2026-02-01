@@ -7,19 +7,27 @@ $message = '';
 // Obsługa formularza (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tytul = trim($_POST['tytul']);
-    $imie_autora = trim($_POST['imie_autora']);
-    $nazwisko_autora = trim($_POST['nazwisko_autora']);
+    $autor_full = trim($_POST['autor_full']);
     $nazwa_kategorii = trim($_POST['nazwa_kategorii']);
     $numer_polki = trim($_POST['numer_polki']);
 
-    if ($tytul && $imie_autora && $nazwisko_autora && $nazwa_kategorii && $numer_polki) {
-        try {
-            // Wywołanie procedury składowanej Smart Insert
-            $stmt = $pdo->prepare("CALL DodajKsiazkeZAutorem(?, ?, ?, ?, ?)");
-            $stmt->execute([$imie_autora, $nazwisko_autora, $tytul, $numer_polki, $nazwa_kategorii]);
-            $message = '<div class="alert alert-success">Książka została dodana pomyślnie!</div>';
-        } catch (PDOException $e) {
-            $message = '<div class="alert alert-error">Błąd bazy danych: ' . $e->getMessage() . '</div>';
+    if ($tytul && $autor_full && $nazwa_kategorii && $numer_polki) {
+        // Podział autora na imię i nazwisko (po pierwszej spacji)
+        $parts = explode(' ', $autor_full, 2);
+        $imie_autora = $parts[0];
+        $nazwisko_autora = isset($parts[1]) ? $parts[1] : '';
+
+        if (empty($nazwisko_autora)) {
+            $message = '<div class="alert alert-error">Proszę podać co najmniej imię i nazwisko autora (oddzielone spacją).</div>';
+        } else {
+            try {
+                // Wywołanie procedury składowanej Smart Insert
+                $stmt = $pdo->prepare("CALL DodajKsiazkeZAutorem(?, ?, ?, ?, ?)");
+                $stmt->execute([$imie_autora, $nazwisko_autora, $tytul, $numer_polki, $nazwa_kategorii]);
+                $message = '<div class="alert alert-success">Książka została dodana pomyślnie!</div>';
+            } catch (PDOException $e) {
+                $message = '<div class="alert alert-error">Błąd bazy danych: ' . $e->getMessage() . '</div>';
+            }
         }
     } else {
         $message = '<div class="alert alert-error">Proszę wypełnić wszystkie pola.</div>';
@@ -27,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Pobieranie danych do list
-$autorzy = $pdo->query("SELECT * FROM autorzy ORDER BY nazwisko")->fetchAll();
+$autorzy = $pdo->query("SELECT DISTINCT CONCAT(imie, ' ', nazwisko) as full_name FROM autorzy ORDER BY nazwisko")->fetchAll();
 $kategorie = $pdo->query("SELECT * FROM kategorie ORDER BY nazwa_kategori")->fetchAll();
 $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
 ?>
@@ -44,32 +52,15 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
         </div>
 
         <div class="form-group">
-            <label for="imie_autora">Autor</label>
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <input type="text" name="imie_autora" id="imie_autora" required placeholder="Imię"
-                        list="imiona_list" style="width: 100%;">
-                    <datalist id="imiona_list">
-                        <?php foreach ($autorzy as $autor): ?>
-                            <option value="<?= htmlspecialchars($autor['imie']) ?>">
-                                <?= htmlspecialchars($autor['imie']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </datalist>
-                </div>
-                <div style="flex: 1;">
-                    <input type="text" name="nazwisko_autora" id="nazwisko_autora" required placeholder="Nazwisko"
-                        list="nazwiska_list" style="width: 100%;">
-                    <datalist id="nazwiska_list">
-                        <?php foreach ($autorzy as $autor): ?>
-                                <option value="<?= htmlspecialchars($autor['nazwisko']) ?>"><?= htmlspecialchars($autor['nazwisko']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </datalist>
-                </div>
-            </div>
-            <small style="color: #8b949e; display: block; margin-top: 5px;">Zacznij pisać aby zobaczyć sugestie lub
-                wpisz nowego autora.</small>
+            <label for="autor_full">Autor (Imię i Nazwisko)</label>
+            <input type="text" name="autor_full" id="autor_full" required placeholder="np. Adam Mickiewicz"
+                list="autorzy_list" style="width: 100%;">
+            <datalist id="autorzy_list">
+                <?php foreach ($autorzy as $autor): ?>
+                    <option value="<?= htmlspecialchars($autor['full_name']) ?>"><?= htmlspecialchars($autor['full_name']) ?></option>
+                <?php endforeach; ?>
+            </datalist>
+            <small style="color: #8b949e; display: block; margin-top: 5px;">Wpisz imię i nazwisko oddzielone spacją.</small>
         </div>
 
         <div class="form-group">
@@ -78,9 +69,8 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
                 list="kategorie_list">
             <datalist id="kategorie_list">
                 <?php foreach ($kategorie as $kategoria): ?>
-                        <option value="<?= htmlspecialchars($kategoria['nazwa_kategori']) ?>"><?= htmlspecialchars($kategoria['nazwa_kategori']) ?>
-                            </option>
-                        <?php endforeach; ?>
+                    <option value="<?= htmlspecialchars($kategoria['nazwa_kategori']) ?>"><?= htmlspecialchars($kategoria['nazwa_kategori']) ?></option>
+                <?php endforeach; ?>
             </datalist>
             <small style="color: #8b949e; display: block; margin-top: 5px;">Wybierz z listy lub wpisz nową
                 kategorię.</small>
@@ -92,9 +82,8 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
                 list="polki_list">
             <datalist id="polki_list">
                 <?php foreach ($polki as $polka): ?>
-                        <option value="<?= htmlspecialchars($polka['numer_polki']) ?>">Półka nr <?= htmlspecialchars($polka['numer_polki']) ?>
-                            </option>
-                        <?php endforeach; ?>
+                    <option value="<?= htmlspecialchars($polka['numer_polki']) ?>">Półka nr <?= htmlspecialchars($polka['numer_polki']) ?></option>
+                <?php endforeach; ?>
             </datalist>
             <small style="color: #8b949e; display: block; margin-top: 5px;">Wybierz z listy lub wpisz nowy
                 numer.</small>
