@@ -44,61 +44,55 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
         </div>
 
         <div class="form-group">
-            <label>Autor</label>
-            <div style="margin-bottom: 10px;">
-                <select id="author_select" class="form-control" onchange="fillAuthor(this)">
-                    <option value="">-- Wybierz istniejącego autora --</option>
-                    <?php foreach ($autorzy as $autor): ?>
-                        <option value="<?= $autor['id_autora'] ?>" data-imie="<?= htmlspecialchars($autor['imie']) ?>"
-                            data-nazwisko="<?= htmlspecialchars($autor['nazwisko']) ?>">
-                            <?= htmlspecialchars($autor['nazwisko'] . ' ' . $autor['imie']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <small style="color: grey;">Wybierz z listy, aby uzupełnić poniższe pola.</small>
-            </div>
+            <label for="imie_autora">Autor</label>
             <div style="display: flex; gap: 10px;">
                 <div style="flex: 1;">
                     <input type="text" name="imie_autora" id="imie_autora" required placeholder="Imię"
-                        style="width: 100%;">
+                        list="imiona_list" style="width: 100%;">
+                    <datalist id="imiona_list">
+                        <?php foreach ($autorzy as $autor): ?>
+                            <option value="<?= htmlspecialchars($autor['imie']) ?>">
+                            <?php endforeach; ?>
+                    </datalist>
                 </div>
                 <div style="flex: 1;">
                     <input type="text" name="nazwisko_autora" id="nazwisko_autora" required placeholder="Nazwisko"
-                        style="width: 100%;">
+                        list="nazwiska_list" style="width: 100%;">
+                    <datalist id="nazwiska_list">
+                        <?php foreach ($autorzy as $autor): ?>
+                            <option value="<?= htmlspecialchars($autor['nazwisko']) ?>">
+                            <?php endforeach; ?>
+                    </datalist>
                 </div>
             </div>
-            <small style="color: #8b949e; display: block; margin-top: 5px;">Lub wpisz ręcznie nowego autora.</small>
+            <small style="color: #8b949e; display: block; margin-top: 5px;">Zacznij pisać aby zobaczyć sugestie lub
+                wpisz nowego autora.</small>
         </div>
 
         <div class="form-group">
-            <label for="id_kategori">Kategoria</label>
-            <div style="margin-bottom: 10px;">
-                <select id="category_select" class="form-control"
-                    onchange="fillInput('category_select', 'nazwa_kategorii')">
-                    <option value="">-- Wybierz kategorię --</option>
-                    <?php foreach ($kategorie as $kategoria): ?>
-                        <option value="<?= htmlspecialchars($kategoria['nazwa_kategori']) ?>">
-                            <?= htmlspecialchars($kategoria['nazwa_kategori']) ?>
-                        </option>
+            <label for="nazwa_kategorii">Kategoria</label>
+            <input type="text" id="nazwa_kategorii" name="nazwa_kategorii" required placeholder="Wpisz kategorię"
+                list="kategorie_list">
+            <datalist id="kategorie_list">
+                <?php foreach ($kategorie as $kategoria): ?>
+                    <option value="<?= htmlspecialchars($kategoria['nazwa_kategori']) ?>">
                     <?php endforeach; ?>
-                </select>
-            </div>
-            <input type="text" id="nazwa_kategorii" name="nazwa_kategorii" required placeholder="Wpisz kategorię">
+            </datalist>
+            <small style="color: #8b949e; display: block; margin-top: 5px;">Wybierz z listy lub wpisz nową
+                kategorię.</small>
         </div>
 
         <div class="form-group">
-            <label for="id_polki">Półka</label>
-            <div style="margin-bottom: 10px;">
-                <select id="shelf_select" class="form-control" onchange="fillInput('shelf_select', 'numer_polki')">
-                    <option value="">-- Wybierz półkę --</option>
-                    <?php foreach ($polki as $polka): ?>
-                        <option value="<?= htmlspecialchars($polka['numer_polki']) ?>">
-                            Półka nr <?= htmlspecialchars($polka['numer_polki']) ?>
-                        </option>
+            <label for="numer_polki">Półka</label>
+            <input type="number" id="numer_polki" name="numer_polki" required placeholder="Numer półki"
+                list="polki_list">
+            <datalist id="polki_list">
+                <?php foreach ($polki as $polka): ?>
+                    <option value="<?= htmlspecialchars($polka['numer_polki']) ?>">
                     <?php endforeach; ?>
-                </select>
-            </div>
-            <input type="number" id="numer_polki" name="numer_polki" required placeholder="Numer półki">
+            </datalist>
+            <small style="color: #8b949e; display: block; margin-top: 5px;">Wybierz z listy lub wpisz nowy
+                numer.</small>
         </div>
 
         <div style="margin-top: 25px; text-align: right;">
@@ -107,28 +101,5 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
         </div>
     </form>
 </div>
-
-<script>
-    function fillAuthor(select) {
-        if (select.value) {
-            const option = select.options[select.selectedIndex];
-            document.getElementById('imie_autora').value = option.getAttribute('data-imie');
-            document.getElementById('nazwisko_autora').value = option.getAttribute('data-nazwisko');
-        } else {
-            document.getElementById('imie_autora').value = '';
-            document.getElementById('nazwisko_autora').value = '';
-        }
-    }
-
-    function fillInput(selectId, inputId) {
-        const select = document.getElementById(selectId);
-        const input = document.getElementById(inputId);
-        if (select.value) {
-            input.value = select.value;
-        } else {
-            input.value = '';
-        }
-    }
-</script>
 
 <?php require_once 'templates/footer.php'; ?>
