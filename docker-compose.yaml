@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+
+  # Baza danych (MariaDB)
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: Ewhmgtw2
+      MYSQL_DATABASE: biblioteka    # Automatycznie utworzy bazę 'biblioteka'
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      # Automatyczny import pliku SQL przy pierwszym uruchomieniu
+      #- ./biblioteka.sql:/docker-entrypoint-initdb.d/init.sql
+      # Opcjonalnie: import procedury (musi być alfanumerycznie po biblioteka.sql)
+      #- ./procedura_smart_insert.sql:/docker-entrypoint-initdb.d/z_procedura.sql
+    networks:
+      - backend
+
+  # phpMyAdmin (do zarządzania bazą)
+  phpmyadmin:
+    image: phpmyadmin:apache
+    container_name: phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: Ewhmgtw2
+    volumes:
+      - phpmyadmin_sessions:/sessions
+    networks:
+      - backend
+
+  # Nasza Aplikacja (PHP + Apache)
+  app:
+    build: .                        # Buduje obraz z Dockerfile w bieżącym katalogu
+    container_name: biblioteka_app
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    ports:
+      - "9071:80"                   # Port 9071 (żądany przez użytkownika)
+    volumes:
+      - ./php:/var/www/html         # Mapowanie katalogu php do serwera
+    environment:
+      DB_HOST: mariadb
+      DB_NAME: biblioteka
+      DB_USER: root
+      DB_PASS: Ewhmgtw2
+    networks:
+      - backend
+
+volumes:
+  mariadb_data:
+  phpmyadmin_sessions:
+
+networks:
+  backend:
+    driver: bridge

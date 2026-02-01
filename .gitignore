@@ -1,0 +1,20 @@
+# PHP
+*.log
+*.cache
+
+# Database config (if sensitive)
+# config.php
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+vendor/
+node_modules/
