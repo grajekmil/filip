@@ -100,30 +100,22 @@ Interfejs użytkownika znajdujący się w katalogu `php/`. System wykorzystuje n
 
 #### 📄 `php/add_book.php` (Formularz Dodawania Książki)
 *   **Rola:** Zaawansowany formularz do dodawania nowych książek.
-*   **Główna innowacja:** Wykorzystuje procedurę składowaną `DodajKsiazkeZAutorem` zamiast ręcznych INSERT.
+*   **Główna innowacja:** Wykorzystuje procedurę składowaną `DodajKsiazkeZAutorem` oraz natywne elementy HTML5 dla maksymalnej lekkości.
 *   **Funkcjonalności:**
-    1.  **Pole tytułu** - Prosty input tekstowy
-    2.  **Sekcja autora** - Hybrydowy system:
-        *   Lista rozwijana z istniejącymi autorami
-        *   Dwa pola tekstowe (imię, nazwisko) do ręcznego wprowadzenia
-        *   JavaScript automatycznie wypełnia pola po wyborze z listy
-        *   Możliwość dodania nowego autora "w locie"
-    3.  **Sekcja kategorii:**
-        *   Lista rozwijana z istniejącymi kategoriami
-        *   Pole tekstowe do wprowadzenia nowej kategorii
-        *   Automatyczne uzupełnianie po wyborze z listy
-    4.  **Sekcja półki:**
-        *   Lista rozwijana z istniejącymi półkami
-        *   Pole numeryczne do wprowadzenia nowego numeru
-        *   Automatyczne uzupełnianie po wyborze z listy
+    1.  **Pole tytułu** - Prosty input tekstowy.
+    2.  **Sekcja autora (Uproszczona):**
+        *   Pojedyncze pole tekstowe na Imię i Nazwisko.
+        *   Używa `<datalist>` do sugerowania istniejących autorów (np. "Adam Mickiewicz").
+        *   **Logika po stronie serwera:** PHP automatycznie rozdziela wpisany tekst po pierwszej spacji, przekazując osobno imię i nazwisko do procedury SQL (obsługa nazwisk wieloczłonowych).
+    3.  **Sekcja kategorii i półek (HTML5 Datalist):**
+        *   Zamiast klasycznych list rozwijanych (`select`), zastosowano pola `input` połączone z `datalist`.
+        *   Pozwala to na wybór z listy podpowiedzi lub szybkie wpisanie nowej wartości.
+        *   Rozwiązanie jest w 100% natywne dla HTML5 i nie wymaga JavaScriptu.
 *   **Obsługa formularza (POST):**
-    *   Walidacja wszystkich pól
-    *   Wywołanie procedury: `CALL DodajKsiazkeZAutorem(?, ?, ?, ?, ?)`
-    *   Wyświetlanie komunikatów sukcesu/błędu
-    *   Obsługa wyjątków PDO
-*   **JavaScript:**
-    *   Funkcja `fillAuthor()` - wypełnia pola imienia i nazwiska
-    *   Funkcja `fillInput()` - uniwersalna funkcja do kopiowania wartości z select do input
+    *   Walidacja wszystkich pól.
+    *   Automatyczny podział autora na imię i nazwisko.
+    *   Wywołanie procedury: `CALL DodajKsiazkeZAutorem(?, ?, ?, ?, ?)`.
+    *   Kompletna obsługa błędów i komunikatów sukcesu.
 *   **Przyciski:** "Anuluj" (powrót do index.php) i "Zapisz Książkę" (submit).
 
 #### 📄 `php/shelves.php` (Zarządzanie Półkami)
@@ -147,24 +139,23 @@ Interfejs użytkownika znajdujący się w katalogu `php/`. System wykorzystuje n
 *   **Ostrzeżenie CASCADE:** Usunięcie półki automatycznie usuwa wszystkie książki na niej stojące (relacja ON DELETE CASCADE w bazie).
 
 #### 📄 `php/clients.php` (Zarządzanie Klientami)
-*   **Rola:** Moduł rejestracji i zarządzania czytelnikami.
-*   **Layout:** Układ dwukolumnowy (grid 1fr 2fr):
-    *   Lewa kolumna: Formularz rejestracji
-    *   Prawa kolumna: Baza klientów
+*   **Rola:** Kompletny moduł do zarządzania czytelnikami (pełne CRUD).
+*   **Layout:** Układ dwukolumnowy:
+    *   Lewa kolumna: Dynamiczny formularz (Dodawanie / Edycja).
+    *   Prawa kolumna: Tabela z listą klientów.
 *   **Funkcjonalności:**
-    1.  **Rejestracja klienta (POST):**
-        *   Formularz z trzema polami:
-            *   Imię (type="text")
-            *   Nazwisko (type="text")
-            *   Email (type="email")
-        *   INSERT do tabeli `klient`
-        *   Walidacja wszystkich pól
-        *   Komunikat potwierdzenia z imieniem i nazwiskiem
-    2.  **Lista klientów:**
-        *   Tabela z kolumnami: ID, Imię i Nazwisko, Email, Akcje
-        *   Sortowanie alfabetyczne po nazwisku
-        *   Placeholdery dla przyszłych funkcji edycji/usuwania
-*   **Walidacja:** Wszystkie pola są wymagane (required), email ma walidację HTML5.
+    1.  **Dodawanie i Edycja:**
+        *   Formularz automatycznie przełącza się w "Tryb Edycji" po kliknięciu linku.
+        *   Obsługa pól: Imię, Nazwisko, Adres Email.
+        *   Walidacja danych i ochrona przed XSS (`htmlspecialchars`).
+    2.  **Usuwanie z zabezpieczeniem:**
+        *   Można usunąć klienta tylko, jeśli nie ma on obecnie żadnych wypożyczonych książek.
+        *   Wymaga potwierdzenia JavaScript (`confirm()`) przed wykonaniem akcji.
+        *   Używa parametrów GET (`?delete=id`) i bezpiecznych Prepared Statements.
+    3.  **Lista klientów:**
+        *   Sortowanie alfabetyczne.
+        *   Kolorowe komunikaty o sukcesie lub błędzie operacji.
+*   **Walidacja:** Pełna walidacja po stronie serwera i HTML5.
 
 ---
 
@@ -314,16 +305,17 @@ docker-compose down -v
 
 Możliwe funkcjonalności do dodania:
 
-*   ✅ System wypożyczeń z datami (wypożyczenie/zwrot)
-*   ✅ Edycja i usuwanie książek
 *   ✅ Edycja i usuwanie klientów
-*   ✅ Wyszukiwarka książek (po tytule, autorze, kategorii)
-*   ✅ Historia wypożyczeń klienta
-*   ✅ Raporty i statystyki (najpopularniejsze książki, najaktywniejszi czytelnicy)
-*   ✅ System rezerwacji książek
-*   ✅ Powiadomienia email o zbliżającym się terminie zwrotu
-*   ✅ Panel administratora z kontrolą dostępu
-*   ✅ API REST dla integracji z innymi systemami
+*   ✅ Uproszczony formularz dodawania książek (Datalist)
+*   ✅ Inteligentne zarządzanie autorami (pojedyncze pole)
+*   [ ] System wypożyczeń z datami (wypożyczenie/zwrot)
+*   [ ] Edycja i usuwanie książek
+*   [ ] Wyszukiwarka książek (po tytule, autorze, kategorii)
+*   [ ] Historia wypożyczeń klienta
+*   [ ] Raporty i statystyki
+*   [ ] System rezerwacji książek
+*   [ ] Powiadomienia email
+*   [ ] Logowanie administratora
 
 ---
 
