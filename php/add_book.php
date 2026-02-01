@@ -52,7 +52,9 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
                     <datalist id="imiona_list">
                         <?php foreach ($autorzy as $autor): ?>
                             <option value="<?= htmlspecialchars($autor['imie']) ?>">
-                            <?php endforeach; ?>
+                                <?= htmlspecialchars($autor['imie']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </datalist>
                 </div>
                 <div style="flex: 1;">
@@ -60,8 +62,9 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
                         list="nazwiska_list" style="width: 100%;">
                     <datalist id="nazwiska_list">
                         <?php foreach ($autorzy as $autor): ?>
-                            <option value="<?= htmlspecialchars($autor['nazwisko']) ?>">
-                            <?php endforeach; ?>
+                                <option value="<?= htmlspecialchars($autor['nazwisko']) ?>"><?= htmlspecialchars($autor['nazwisko']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </datalist>
                 </div>
             </div>
@@ -75,8 +78,9 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
                 list="kategorie_list">
             <datalist id="kategorie_list">
                 <?php foreach ($kategorie as $kategoria): ?>
-                    <option value="<?= htmlspecialchars($kategoria['nazwa_kategori']) ?>">
-                    <?php endforeach; ?>
+                        <option value="<?= htmlspecialchars($kategoria['nazwa_kategori']) ?>"><?= htmlspecialchars($kategoria['nazwa_kategori']) ?>
+                            </option>
+                        <?php endforeach; ?>
             </datalist>
             <small style="color: #8b949e; display: block; margin-top: 5px;">Wybierz z listy lub wpisz nową
                 kategorię.</small>
@@ -88,8 +92,9 @@ $polki = $pdo->query("SELECT * FROM polki ORDER BY numer_polki")->fetchAll();
                 list="polki_list">
             <datalist id="polki_list">
                 <?php foreach ($polki as $polka): ?>
-                    <option value="<?= htmlspecialchars($polka['numer_polki']) ?>">
-                    <?php endforeach; ?>
+                        <option value="<?= htmlspecialchars($polka['numer_polki']) ?>">Półka nr <?= htmlspecialchars($polka['numer_polki']) ?>
+                            </option>
+                        <?php endforeach; ?>
             </datalist>
             <small style="color: #8b949e; display: block; margin-top: 5px;">Wybierz z listy lub wpisz nowy
                 numer.</small>
