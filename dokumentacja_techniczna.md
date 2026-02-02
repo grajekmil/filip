@@ -94,7 +94,6 @@ Interfejs użytkownika znajdujący się w katalogu `php/`. System wykorzystuje n
         *   Status wypożyczenia:
             *   **Dostępna** (zielony) - książka nie jest wypożyczona
             *   **Wypożyczona** (czerwony) - z informacją kto wypożyczył
-        *   Kolumna akcji (placeholder dla przyszłych funkcji edycji)
 *   **Zapytanie SQL:** Używa złożonego JOIN łączącego 5 tabel (`ksiazki`, `autorzy`, `kategorie`, `polki`, `klient`) z LEFT JOIN dla klientów.
 *   **Przycisk:** "+ Dodaj Książkę" prowadzi do `add_book.php`.
 
