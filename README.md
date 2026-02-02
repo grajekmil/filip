@@ -4,7 +4,7 @@ Nowoczesny, responsywny system do zarządzania biblioteką zbudowany w czystym P
 
 ## ✨ Główne Funkcje
 
-- **Dashboard Statystyk**: Podgląd na żywo liczby książek, autorów i klientów.
+- **Dashboard Statystyk**: Podgląd na żywo liczby książek, wypożyczeń, wolnych pozycji, autorów i klientów.
 - **Zarządzanie Książkami**: Pełna lista z dynamicznym statusem dostępności.
 - **Inteligentne Dodawanie**: Formularz z autozupełnianiem (Datalist) i automatycznym rozpoznawaniem autorów.
 - **Baza Klientów**: Pełny moduł CRUD z zabezpieczeniem przed usuwaniem dłużników.

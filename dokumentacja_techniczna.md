@@ -83,6 +83,8 @@ Interfejs użytkownika znajdujący się w katalogu `php/`. System wykorzystuje n
 *   **Funkcjonalności:**
     1.  **Statystyki** - Wyświetla trzy kafelki z liczbami:
         *   Liczba książek w systemie
+        *   **Wypożyczone książki** (nowość)
+        *   **Dostępne książki** (nowość)
         *   Liczba autorów
         *   Liczba zarejestrowanych klientów
     2.  **Lista książek** - Tabela z kompletnymi informacjami:
@@ -322,6 +324,7 @@ Możliwe funkcjonalności do dodania:
 *   ✅ Edycja i usuwanie klientów
 *   ✅ Uproszczony formularz dodawania książek (Datalist)
 *   ✅ Inteligentne zarządzanie autorami (pojedyncze pole)
+*   ✅ Statystyki wypożyczeń na dashboardzie
 *   [ ] System wypożyczeń z datami (wypożyczenie/zwrot)
 *   [ ] Edycja i usuwanie książek
 *   [ ] Wyszukiwarka książek (po tytule, autorze, kategorii)

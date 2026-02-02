@@ -6,7 +6,9 @@ require_once 'templates/header.php';
 $stats = [
     'books' => $pdo->query("SELECT COUNT(*) FROM ksiazki")->fetchColumn(),
     'authors' => $pdo->query("SELECT COUNT(*) FROM autorzy")->fetchColumn(),
-    'clients' => $pdo->query("SELECT COUNT(*) FROM klient")->fetchColumn()
+    'clients' => $pdo->query("SELECT COUNT(*) FROM klient")->fetchColumn(),
+    'borrowed' => $pdo->query("SELECT COUNT(*) FROM ksiazki WHERE id_klienta IS NOT NULL")->fetchColumn(),
+    'available' => $pdo->query("SELECT COUNT(*) FROM ksiazki WHERE id_klienta IS NULL")->fetchColumn()
 ];
 
 // Pobranie listy książek z pełnymi danymi (JOIN)
