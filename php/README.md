@@ -35,5 +35,6 @@ Następnie otwórz przeglądarkę pod adresem: [http://localhost:8000](http://lo
 *   `add_book.php` - Formularz dodawania książki
 *   `shelves.php` - Zarządzanie półkami
 *   `clients.php` - Zarządzanie klientami
+*   `loans.php` - Zarządzanie wypożyczeniami (wypożycz/zwróć)
 *   `style.css` - Arkusze stylów (Dark Mode)
 *   `config.php` - Połączenie z bazą

@@ -35,6 +35,7 @@ Najprostszy sposób na uruchomienie projektu to użycie Docker Compose.
 
 - `/php` - Kod źródłowy aplikacji webowej
 - `/php/templates` - Komponenty wspólne (nagłówek, stopka)
+- `/php/loans.php` - Moduł wypożyczeń
 - `docker-compose.yaml` - Konfiguracja infrastruktury
 - `procedura_smart_insert.sql` - Logika biznesowa w bazie danych
 - `dokumentacja_techniczna.md` - Szczegółowy opis architektury

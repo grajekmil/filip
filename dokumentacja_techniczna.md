@@ -137,6 +137,21 @@ Interfejs użytkownika znajdujący się w katalogu `php/`. System wykorzystuje n
     *   Sortowanie po numerze półki
 *   **Ostrzeżenie CASCADE:** Usunięcie półki automatycznie usuwa wszystkie książki na niej stojące (relacja ON DELETE CASCADE w bazie).
 
+#### 📄 `php/loans.php` (Zarządzanie Wypożyczeniami)
+*   **Rola:** Moduł do zarządzania wypożyczeniami książek.
+*   **Funkcjonalności:**
+    1.  **Wypożyczanie książek:**
+        *   Formularz umożliwiający przypisanie książki do klienta.
+        *   Wybór książki i klienta z list rozwijanych (SELECT).
+        *   Aktualizacja pola `id_klienta` w tabeli `ksiazki`.
+    2.  **Zwracanie książek:**
+        *   Przycisk "Zwróć" przy wypożyczonych książkach.
+        *   Ustawienie `id_klienta` na `NULL` dla danej książki.
+    3.  **Lista wypożyczeń:**
+        *   Tabela wyświetlająca aktualnie wypożyczone książki.
+        *   Informacje o książce (tytuł, autor) i kliencie (imię, nazwisko).
+*   **Walidacja:** Sprawdzenie dostępności książki przed wypożyczeniem.
+
 #### 📄 `php/clients.php` (Zarządzanie Klientami)
 *   **Rola:** Kompletny moduł do zarządzania czytelnikami (pełne CRUD).
 *   **Layout:** Układ dwukolumnowy:

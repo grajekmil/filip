@@ -20,12 +20,11 @@
                 </a>
             </div>
             <nav>
-                <a href="index.php"
-                    class="<?= (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : '' ?>">Książki</a>
-                <a href="shelves.php"
-                    class="<?= (basename($_SERVER['PHP_SELF']) == 'shelves.php') ? 'active' : '' ?>">Półki</a>
-                <a href="clients.php"
-                    class="<?= (basename($_SERVER['PHP_SELF']) == 'clients.php') ? 'active' : '' ?>">Klienci</a>
+                <?php $current_page = basename($_SERVER['PHP_SELF']); ?>
+                <a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Książki</a>
+                <a href="loans.php" class="<?= ($current_page == 'loans.php') ? 'active' : '' ?>">Wypożyczenia</a>
+                <a href="shelves.php" class="<?= ($current_page == 'shelves.php') ? 'active' : '' ?>">Półki</a>
+                <a href="clients.php" class="<?= ($current_page == 'clients.php') ? 'active' : '' ?>">Klienci</a>
             </nav>
         </header>
         <main>
