@@ -15,7 +15,9 @@
     <div class="container">
         <header>
             <div class="logo">
-                <h1>📚 Biblioteka</h1>
+                <a href="index.php" class="logo-link">
+                    <h1>📚 Biblioteka</h1>
+                </a>
             </div>
             <nav>
                 <a href="index.php"

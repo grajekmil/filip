@@ -66,7 +66,6 @@ $books = $stmt->fetchAll();
                 <th>Kategoria</th>
                 <th>Półka</th>
                 <th>Status</th>
-                <th>Akcje</th>
             </tr>
         </thead>
         <tbody>
@@ -98,10 +97,6 @@ $books = $stmt->fetchAll();
                         <?php else: ?>
                             <span style="color: #238636;">Dostępna</span>
                         <?php endif; ?>
-                    </td>
-                    <td>
-                        <!-- Tutaj mogłyby być przyciski edycji/usuwania -->
-                        <a href="#" style="color: #8b949e; text-decoration: none;">Edytuj</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
