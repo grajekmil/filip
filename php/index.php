@@ -40,6 +40,18 @@ $books = $stmt->fetchAll();
         </div>
     </div>
     <div class="stat-card">
+        <div>Wypożyczone</div>
+        <div class="stat-number" style="color: #da3633;">
+            <?= $stats['borrowed'] ?>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div>Dostępne</div>
+        <div class="stat-number" style="color: #238636;">
+            <?= $stats['available'] ?>
+        </div>
+    </div>
+    <div class="stat-card">
         <div>Autorzy</div>
         <div class="stat-number">
             <?= $stats['authors'] ?>
