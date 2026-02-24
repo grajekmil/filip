@@ -1,24 +1,24 @@
-# Pełna Dokumentacja Techniczna Systemu Bibliotecznego
+# Pełna Dokumentacja Techniczna Systemu Wypożyczalni Rowerów
 
-Ten dokument opisuje wszystkie pliki stworzone w ramach projektu "System Biblioteczny". Projekt składa się z trzech głównych warstw: Bazy Danych (SQL), Aplikacji Webowej (PHP) oraz Infrastruktury (Docker).
+Ten dokument opisuje wszystkie pliki stworzone w ramach projektu "System Wypożyczalni Rowerów". Projekt składa się z trzech głównych warstw: Bazy Danych (SQL), Aplikacji Webowej (PHP) oraz Infrastruktury (Docker).
 
 ---
 
 ## 1. Warstwa Bazy Danych (SQL)
 
-Pliki odpowiedzialne za strukturę i logikę danych w bazie `biblioteka`.
+Pliki odpowiedzialne za strukturę i logikę danych w bazie `wypozyczalnia`.
 
 ### 📄 `procedura_smart_insert.sql`
-*   **Co to jest:** Plik definiujący Procedurę Składowaną `DodajKsiazkeZAutorem`.
-*   **Jak działa:** To "inteligentna" funkcja wewnątrz bazy danych. Pozwala dodać książkę podając nazwę autora, kategorii i numer półki. Procedura sama sprawdza, czy te elementy istnieją – jeśli nie, to je tworzy w odpowiednich tabelach, a na końcu dodaje książkę.
+*   **Co to jest:** Plik definiujący Procedurę Składowaną `DodajRowerZMarka`.
+*   **Jak działa:** To "inteligentna" funkcja wewnątrz bazy danych. Pozwala dodać rower podając nazwę marki, model, kategorię i numer stacji. Procedura sama sprawdza, czy te elementy istnieją – jeśli nie, to je tworzy w odpowiednich tabelach, a na końcu dodaje rower.
 *   **Parametry procedury:**
-    1.  `p_imie_autora` - Imię autora (VARCHAR 15)
-    2.  `p_nazwisko_autora` - Nazwisko autora (VARCHAR 20)
-    3.  `p_tytul` - Tytuł książki (VARCHAR 20)
-    4.  `p_numer_polki` - Numer półki (INT)
+    1.  `p_nazwa_marki` - Nazwa marki (VARCHAR 15)
+    2.  `p_kraj_marki` - Kraj pochodzenia marki (VARCHAR 20)
+    3.  `p_model` - Model roweru (VARCHAR 20)
+    4.  `p_numer_stacji` - Numer stacji (INT)
     5.  `p_nazwa_kategorii` - Nazwa kategorii (VARCHAR 40)
-*   **Przykład użycia:** `CALL DodajKsiazkeZAutorem('Wisława', 'Szymborska', 'Wiersze', 2, 'poezja');`
-*   **Kiedy używana:** Aktywnie wykorzystywana w formularzu dodawania książek (`add_book.php`).
+*   **Przykład użycia:** `CALL DodajRowerZMarka('Giant', 'Tajwan', 'Roam 1', 2, 'Górski');`
+*   **Kiedy używana:** Aktywnie wykorzystywana w formularzu dodawania rowerów (`add_bike.php`).
 
 ### 📄 `dokumentacja_zapytan.md`
 *   **Co to jest:** Szczegółowy opis wszystkich zapytań i procedur w formacie czytelnym dla człowieka.
@@ -37,7 +37,7 @@ Interfejs użytkownika znajdujący się w katalogu `php/`. System wykorzystuje n
 *   **Działanie:** Używa biblioteki `PDO` do bezpiecznego połączenia z MySQL/MariaDB.
 *   **Zmienne środowiskowe:**
     *   `DB_HOST` - Host bazy danych (domyślnie: `localhost`)
-    *   `DB_NAME` - Nazwa bazy danych (domyślnie: `biblioteka`)
+    *   `DB_NAME` - Nazwa bazy danych (domyślnie: `rent_rowery`)
     *   `DB_USER` - Użytkownik bazy (domyślnie: `root`)
     *   `DB_PASS` - Hasło do bazy (domyślnie: puste)
 *   **Cechy:** Automatyczna detekcja środowiska (działa lokalnie i w Dockerze), obsługa błędów PDO, domyślny tryb FETCH_ASSOC.
@@ -62,13 +62,14 @@ Interfejs użytkownika znajdujący się w katalogu `php/`. System wykorzystuje n
 *   **Rola:** Szablon nagłówka strony.
 *   **Zawartość:**
     *   Meta tagi HTML5 (charset UTF-8, viewport)
-    *   Tytuł strony: "System Biblioteczny"
+    *   Tytuł strony: "Wypożyczalnia Rowerów"
     *   Ładowanie czcionki Inter z Google Fonts
     *   Ładowanie pliku `style.css`
-    *   Logo aplikacji: "📚 Biblioteka"
-    *   Menu nawigacyjne z trzema linkami:
-        *   Książki (`index.php`)
-        *   Półki (`shelves.php`)
+    *   Logo aplikacji: "🚲 Wypożyczalnia"
+    *   Menu nawigacyjne z czterema linkami:
+        *   Rowery (`index.php`)
+        *   Wypożyczenia (`loans.php`)
+        *   Stacje (`stations.php`)
         *   Klienci (`clients.php`)
     *   Aktywna zakładka jest podświetlana (klasa `.active`)
 
@@ -79,99 +80,72 @@ Interfejs użytkownika znajdujący się w katalogu `php/`. System wykorzystuje n
 ### 🖥️ Podstrony (Moduły)
 
 #### 📄 `php/index.php` (Dashboard - Strona Główna)
-*   **Rola:** Główny panel zarządzania biblioteką.
+*   **Rola:** Główny panel zarządzania wypożyczalnią.
 *   **Funkcjonalności:**
-    1.  **Statystyki** - Wyświetla trzy kafelki z liczbami:
-        *   Liczba książek w systemie
-        *   **Wypożyczone książki** (nowość)
-        *   **Dostępne książki** (nowość)
-        *   Liczba autorów
+    1.  **Statystyki** - Wyświetla kafelki z liczbami:
+        *   Liczba rowerów w systemie
+        *   Wypożyczone rowery
+        *   Dostępne rowery
+        *   Liczba marek
         *   Liczba zarejestrowanych klientów
-    2.  **Lista książek** - Tabela z kompletnymi informacjami:
-        *   ID książki
-        *   Tytuł
-        *   Autor (imię i nazwisko)
+    2.  **Lista rowerów** - Tabela z kompletnymi informacjami:
+        *   ID roweru
+        *   Model
+        *   Marka (nazwa i kraj)
         *   Kategoria (w kolorowej etykiecie)
-        *   Numer półki
+        *   Numer stacji
         *   Status wypożyczenia:
-            *   **Dostępna** (zielony) - książka nie jest wypożyczona
-            *   **Wypożyczona** (czerwony) - z informacją kto wypożyczył
-*   **Zapytanie SQL:** Używa złożonego JOIN łączącego 5 tabel (`ksiazki`, `autorzy`, `kategorie`, `polki`, `klient`) z LEFT JOIN dla klientów.
-*   **Przycisk:** "+ Dodaj Książkę" prowadzi do `add_book.php`.
+            *   **Dostępny** (zielony) - rower nie jest wypożyczony
+            *   **Wypożyczony** (czerwony) - z informacją kto wypożyczył
+*   **Zapytanie SQL:** Używa złożonego JOIN łączącego tabele (`rowery`, `marki`, `kategorie`, `stacje`, `klient`).
+*   **Przycisk:** "+ Dodaj Rower" prowadzi do `add_bike.php`.
 
-#### 📄 `php/add_book.php` (Formularz Dodawania Książki)
-*   **Rola:** Zaawansowany formularz do dodawania nowych książek.
-*   **Główna innowacja:** Wykorzystuje procedurę składowaną `DodajKsiazkeZAutorem` oraz natywne elementy HTML5 dla maksymalnej lekkości.
+#### 📄 `php/add_bike.php` (Formularz Dodawania Roweru)
+*   **Rola:** Zaawansowany formularz do dodawania nowych rowerów.
+*   **Główna innowacja:** Wykorzystuje procedurę składowaną `DodajRowerZMarka`.
 *   **Funkcjonalności:**
-    1.  **Pole tytułu** - Prosty input tekstowy.
-    2.  **Sekcja autora (Uproszczona):**
-        *   Pojedyncze pole tekstowe na Imię i Nazwisko.
-        *   Używa `<datalist>` do sugerowania istniejących autorów (np. "Adam Mickiewicz").
-        *   **Logika po stronie serwera:** PHP automatycznie rozdziela wpisany tekst po pierwszej spacji, przekazując osobno imię i nazwisko do procedury SQL (obsługa nazwisk wieloczłonowych).
-    3.  **Sekcja kategorii i półek (HTML5 Datalist):**
-        *   Zamiast klasycznych list rozwijanych (`select`), zastosowano pola `input` połączone z `datalist`.
+    1.  **Pole modelu** - Prosty input tekstowy.
+    2.  **Sekcja marki:**
+        *   Pojedyncze pole tekstowe na Nazwę i Kraj.
+        *   Używa `<datalist>` do sugerowania istniejących marek.
+    3.  **Sekcja kategorii i stacji (HTML5 Datalist):**
         *   Pozwala to na wybór z listy podpowiedzi lub szybkie wpisanie nowej wartości.
-        *   Rozwiązanie jest w 100% natywne dla HTML5 i nie wymaga JavaScriptu.
 *   **Obsługa formularza (POST):**
-    *   Walidacja wszystkich pól.
-    *   Automatyczny podział autora na imię i nazwisko.
-    *   Wywołanie procedury: `CALL DodajKsiazkeZAutorem(?, ?, ?, ?, ?)`.
-    *   Kompletna obsługa błędów i komunikatów sukcesu.
-*   **Przyciski:** "Anuluj" (powrót do index.php) i "Zapisz Książkę" (submit).
+    *   Wywołanie procedury: `CALL DodajRowerZMarka(?, ?, ?, ?, ?)`.
+*   **Przyciski:** "Anuluj" (powrót do index.php) i "Zapisz Rower" (submit).
 
-#### 📄 `php/shelves.php` (Zarządzanie Półkami)
-*   **Rola:** Moduł do zarządzania półkami bibliotecznymi.
-*   **Layout:** Układ dwukolumnowy (grid 1fr 2fr):
-    *   Lewa kolumna: Formularz dodawania
-    *   Prawa kolumna: Lista półek
+#### 📄 `php/stations.php` (Zarządzanie Stacjami)
+*   **Rola:** Moduł do zarządzania stacjami (punktami odbioru).
+*   **Layout:** Układ dwukolumnowy.
 *   **Funkcjonalności:**
-    1.  **Dodawanie półki (POST):**
-        *   Formularz z jednym polem: numer półki (type="number")
-        *   INSERT do tabeli `polki`
-        *   Komunikat potwierdzenia
-    2.  **Usuwanie półki (GET):**
-        *   Przycisk "Usuń" przy każdej półce
-        *   Parametr `?delete=id_polki`
-        *   JavaScript `confirm()` z ostrzeżeniem o CASCADE
-        *   DELETE z tabeli `polki`
-*   **Tabela półek:**
-    *   Kolumny: ID, Numer Półki, Akcje
-    *   Sortowanie po numerze półki
-*   **Ostrzeżenie CASCADE:** Usunięcie półki automatycznie usuwa wszystkie książki na niej stojące (relacja ON DELETE CASCADE w bazie).
+    1.  **Dodawanie stacji (POST):**
+        *   INSERT do tabeli `stacje`
+    2.  **Usuwanie stacji (GET):**
+        *   Parametr `?delete=id_stacji`
+*   **Ostrzeżenie CASCADE:** Usunięcie stacji automatycznie usuwa wszystkie rowery do niej przypisane.
 
 #### 📄 `php/loans.php` (Zarządzanie Wypożyczeniami)
-*   **Rola:** Moduł do zarządzania wypożyczeniami książek.
+*   **Rola:** Moduł do zarządzania wypożyczeniami rowerów.
 *   **Funkcjonalności:**
-    1.  **Wypożyczanie książek:**
-        *   Formularz umożliwiający przypisanie książki do klienta.
-        *   Wybór książki i klienta z list rozwijanych (SELECT).
-        *   Aktualizacja pola `id_klienta` w tabeli `ksiazki`.
-    2.  **Zwracanie książek:**
-        *   Przycisk "Zwróć" przy wypożyczonych książkach.
-        *   Ustawienie `id_klienta` na `NULL` dla danej książki.
+    1.  **Wypożyczanie rowerów:**
+        *   Formularz umożliwiający przypisanie roweru do klienta.
+        *   Wybór roweru i klienta z list rozwijanych (SELECT).
+        *   Aktualizacja pola `id_klienta` w tabeli `rowery`.
+    2.  **Zwracanie rowerów:**
+        *   Przycisk "Zwróć" przy wypożyczonych rowerach.
+        *   Ustawienie `id_klienta` na `NULL` dla danego roweru.
     3.  **Lista wypożyczeń:**
-        *   Tabela wyświetlająca aktualnie wypożyczone książki.
-        *   Informacje o książce (tytuł, autor) i kliencie (imię, nazwisko).
-*   **Walidacja:** Sprawdzenie dostępności książki przed wypożyczeniem.
+        *   Tabela wyświetlająca aktualnie wypożyczone rowery.
+        *   Informacje o rowerze (model, marka) i kliencie (imię, nazwisko).
+*   **Walidacja:** Sprawdzenie dostępności roweru przed wypożyczeniem.
 
 #### 📄 `php/clients.php` (Zarządzanie Klientami)
-*   **Rola:** Kompletny moduł do zarządzania czytelnikami (pełne CRUD).
-*   **Layout:** Układ dwukolumnowy:
-    *   Lewa kolumna: Dynamiczny formularz (Dodawanie / Edycja).
-    *   Prawa kolumna: Tabela z listą klientów.
+*   **Rola:** Kompletny moduł do zarządzania klientami (pełne CRUD).
 *   **Funkcjonalności:**
     1.  **Dodawanie i Edycja:**
-        *   Formularz automatycznie przełącza się w "Tryb Edycji" po kliknięciu linku.
-        *   Obsługa pól: Imię, Nazwisko, Adres Email.
-        *   Walidacja danych i ochrona przed XSS (`htmlspecialchars`).
+        *   Formularz automatycznie przełącza się w "Tryb Edycji".
     2.  **Usuwanie z zabezpieczeniem:**
-        *   Można usunąć klienta tylko, jeśli nie ma on obecnie żadnych wypożyczonych książek.
-        *   Wymaga potwierdzenia JavaScript (`confirm()`) przed wykonaniem akcji.
-        *   Używa parametrów GET (`?delete=id`) i bezpiecznych Prepared Statements.
-    3.  **Lista klientów:**
-        *   Sortowanie alfabetyczne.
-        *   Kolorowe komunikaty o sukcesie lub błędzie operacji.
-*   **Walidacja:** Pełna walidacja po stronie serwera i HTML5.
+        *   Można usunąć klienta tylko, jeśli nie ma on obecnie żadnych wypożyczonych rowerów.
 
 ---
 
@@ -195,7 +169,7 @@ Pliki pozwalające uruchomić całość w izolowanym środowisku kontenerowym.
         *   Restart: `unless-stopped`
         *   Zmienne środowiskowe:
             *   `MYSQL_ROOT_PASSWORD`: Ewhmgtw2
-            *   `MYSQL_DATABASE`: biblioteka
+            *   `MYSQL_DATABASE`: rent_rowery
         *   Wolumeny:
             *   `mariadb_data` - Trwałe przechowywanie danych
             *   Opcjonalnie: `/docker-entrypoint-initdb.d/` dla automatycznego importu SQL
@@ -216,14 +190,14 @@ Pliki pozwalające uruchomić całość w izolowanym środowisku kontenerowym.
 
     3.  **app** (Aplikacja PHP)
         *   Build: Z lokalnego `Dockerfile`
-        *   Nazwa kontenera: `biblioteka_app`
+        *   Nazwa kontenera: `rent_rowery_app`
         *   Port: `9071:80` (aplikacja dostępna na http://localhost:9071)
         *   Zależności: `mariadb`
         *   Wolumeny:
             *   `./php:/var/www/html` - Live reload kodu PHP
         *   Zmienne środowiskowe:
             *   `DB_HOST`: mariadb
-            *   `DB_NAME`: biblioteka
+            *   `DB_NAME`: rent_rowery
             *   `DB_USER`: root
             *   `DB_PASS`: Ewhmgtw2
         *   Sieć: `backend`
@@ -262,18 +236,18 @@ docker-compose down -v
 
 ### Tabele
 
-1.  **autorzy**
-    *   `id_autora` (INT, PRIMARY KEY, AUTO_INCREMENT)
-    *   `imie` (VARCHAR 15)
-    *   `nazwisko` (VARCHAR 20)
+1.  **marki**
+    *   `id_marki` (INT, PRIMARY KEY, AUTO_INCREMENT)
+    *   `nazwa` (VARCHAR 15)
+    *   `kraj` (VARCHAR 20)
 
 2.  **kategorie**
     *   `id_kategori` (INT, PRIMARY KEY, AUTO_INCREMENT)
     *   `nazwa_kategori` (VARCHAR 40)
 
-3.  **polki**
-    *   `id_polki` (INT, PRIMARY KEY, AUTO_INCREMENT)
-    *   `numer_polki` (INT)
+3.  **stacje**
+    *   `id_stacji` (INT, PRIMARY KEY, AUTO_INCREMENT)
+    *   `numer_stacji` (INT)
 
 4.  **klient**
     *   `id_klienta` (INT, PRIMARY KEY, AUTO_INCREMENT)
@@ -281,19 +255,19 @@ docker-compose down -v
     *   `nazwisko` (VARCHAR 20)
     *   `adres_email` (VARCHAR 50)
 
-5.  **ksiazki** (Tabela główna)
-    *   `id_ksiazki` (INT, PRIMARY KEY, AUTO_INCREMENT)
-    *   `id_autora` (INT, FOREIGN KEY → autorzy)
-    *   `id_polki` (INT, FOREIGN KEY → polki, ON DELETE CASCADE)
+5.  **rowery** (Tabela główna)
+    *   `id_roweru` (INT, PRIMARY KEY, AUTO_INCREMENT)
+    *   `id_marki` (INT, FOREIGN KEY → marki)
+    *   `id_stacji` (INT, FOREIGN KEY → stacje, ON DELETE CASCADE)
     *   `id_kategori` (INT, FOREIGN KEY → kategorie)
-    *   `tytul` (VARCHAR 20)
-    *   `id_klienta` (INT, FOREIGN KEY → klient, NULL jeśli dostępna)
+    *   `model` (VARCHAR 20)
+    *   `id_klienta` (INT, FOREIGN KEY → klient, NULL jeśli dostępny)
 
 ### Relacje
 
-*   Książka **musi mieć** autora, kategorię i półkę (NOT NULL)
-*   Książka **może być** wypożyczona przez klienta (NULL = dostępna)
-*   Usunięcie półki **usuwa kaskadowo** wszystkie książki na niej (ON DELETE CASCADE)
+*   Rower **musi mieć** markę, kategorię i stację (NOT NULL)
+*   Rower **może być** wypożyczony przez klienta (NULL = dostępny)
+*   Usunięcie stacji **usuwa kaskadowo** wszystkie rowery do niej przypisane (ON DELETE CASCADE)
 
 ---
 
@@ -338,4 +312,4 @@ Możliwe funkcjonalności do dodania:
 
 ## 7. Podsumowanie
 
-System Biblioteczny to kompletna aplikacja webowa do zarządzania biblioteką, zbudowana w czystym PHP bez frameworków. Wykorzystuje nowoczesne technologie (Docker, PDO, Procedury Składowane) i dobre praktyki programistyczne. Dzięki modularnej strukturze i przejrzystemu kodowi, system jest łatwy w rozbudowie i utrzymaniu.
+System Wypożyczalni Rowerów to kompletna aplikacja webowa do zarządzania wypożyczalnią, zbudowana w czystym PHP bez frameworków. Wykorzystuje nowoczesne technologie (Docker, PDO, Procedury Składowane) i dobre praktyki programistyczne. Dzięki modularnej strukturze i przejrzystemu kodowi, system jest łatwy w rozbudowie i utrzymaniu.

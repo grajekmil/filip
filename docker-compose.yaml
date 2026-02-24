@@ -9,12 +9,12 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: Ewhmgtw2
-      MYSQL_DATABASE: biblioteka    # Automatycznie utworzy bazę 'biblioteka'
+      MYSQL_DATABASE: rent_rowery # Automatycznie utworzy bazę 'rent_rowery'
     volumes:
       - mariadb_data:/var/lib/mysql
       # Automatyczny import pliku SQL przy pierwszym uruchomieniu
-      #- ./biblioteka.sql:/docker-entrypoint-initdb.d/init.sql
-      # Opcjonalnie: import procedury (musi być alfanumerycznie po biblioteka.sql)
+      - ./rent_rowery.sql:/docker-entrypoint-initdb.d/init.sql
+      # Opcjonalnie: import procedury (musi być alfanumerycznie po rent_rowery.sql)
       #- ./procedura_smart_insert.sql:/docker-entrypoint-initdb.d/z_procedura.sql
     networks:
       - backend
@@ -40,18 +40,18 @@ services:
 
   # Nasza Aplikacja (PHP + Apache)
   app:
-    build: .                        # Buduje obraz z Dockerfile w bieżącym katalogu
-    container_name: biblioteka_app
+    build: . # Buduje obraz z Dockerfile w bieżącym katalogu
+    container_name: rent_rowery_app
     restart: unless-stopped
     depends_on:
       - mariadb
     ports:
-      - "9071:80"                   # Port 9071 (żądany przez użytkownika)
+      - "9071:80" # Port 9071 (żądany przez użytkownika)
     volumes:
-      - ./php:/var/www/html         # Mapowanie katalogu php do serwera
+      - ./php:/var/www/html # Mapowanie katalogu php do serwera
     environment:
       DB_HOST: mariadb
-      DB_NAME: biblioteka
+      DB_NAME: rent_rowery
       DB_USER: root
       DB_PASS: Ewhmgtw2
     networks:
@@ -60,6 +60,7 @@ services:
 volumes:
   mariadb_data:
   phpmyadmin_sessions:
+
 
 networks:
   backend:

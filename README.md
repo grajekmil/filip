@@ -1,14 +1,14 @@
-# System Biblioteczny (Full Stack PHP)
+# System Wypożyczalni Rowerów (Full Stack PHP)
 
-Nowoczesny, responsywny system do zarządzania biblioteką zbudowany w czystym PHP bez użycia frameworków. Projekt wykorzystuje architekturę kontenerową (Docker), bezpieczne połączenia z bazą danych (PDO) oraz zaawansowaną logikę SQL (Procedury Składowane).
+Nowoczesny, responsywny system do zarządzania wypożyczalnią rowerów zbudowany w czystym PHP bez użycia frameworków. Projekt wykorzystuje architekturę kontenerową (Docker), bezpieczne połączenia z bazą danych (PDO) oraz zaawansowaną logikę SQL (Procedury Składowane).
 
 ## ✨ Główne Funkcje
 
-- **Dashboard Statystyk**: Podgląd na żywo liczby książek, wypożyczeń, wolnych pozycji, autorów i klientów.
-- **Zarządzanie Książkami**: Pełna lista z dynamicznym statusem dostępności.
-- **Inteligentne Dodawanie**: Formularz z autozupełnianiem (Datalist) i automatycznym rozpoznawaniem autorów.
-- **Baza Klientów**: Pełny moduł CRUD z zabezpieczeniem przed usuwaniem dłużników.
-- **Zarządzanie Półkami**: Organizacja przestrzeni bibliotecznej z kaskadowym usuwaniem.
+- **Dashboard Statystyk**: Podgląd na żywo liczby rowerów, wypożyczeń, dostępnych maszyn, marek i klientów.
+- **Zarządzanie Rowerami**: Pełna lista z dynamicznym statusem dostępności (model, marka, stacja).
+- **Inteligentne Dodawanie**: Formularz z autozupełnianiem (Datalist) i automatycznym rozpoznawaniem marek/stacji.
+- **Baza Klientów**: Pełny moduł CRUD z zabezpieczeniem przed usuwaniem osób z aktywnymi wypożyczeniami.
+- **Zarządzanie Stacjami**: Organizacja punktów odbioru rowerów z kaskadowym usuwaniem.
 - **Dark Mode**: Elegancki, ciemny interfejs inspirowany nowoczesnymi standardami UI.
 
 ## 🚀 Szybki Start (Docker)
@@ -35,9 +35,9 @@ Najprostszy sposób na uruchomienie projektu to użycie Docker Compose.
 
 - `/php` - Kod źródłowy aplikacji webowej
 - `/php/templates` - Komponenty wspólne (nagłówek, stopka)
-- `/php/loans.php` - Moduł wypożyczeń
+- `/php/loans.php` - Moduł wypożyczeń/zwrotów
 - `docker-compose.yaml` - Konfiguracja infrastruktury
-- `procedura_smart_insert.sql` - Logika biznesowa w bazie danych
+- `procedura_smart_insert.sql` - Logika biznesowa (Smart Insert)
 - `dokumentacja_techniczna.md` - Szczegółowy opis architektury
 
 ## 🔒 Bezpieczeństwo
@@ -48,4 +48,4 @@ Aplikacja implementuje:
 - Bezpieczną konfigurację opartą o zmienne środowiskowe.
 
 ---
-*Projekt stworzony w celach edukacyjnych i demonstracyjnych.*
+*Projekt stworzony w celach edukacyjnych i demonstracyjnych (refaktoryzowany z bazy bibliotecznej).*

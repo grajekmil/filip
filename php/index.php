@@ -4,39 +4,39 @@ require_once 'templates/header.php';
 
 // Pobranie statystyk
 $stats = [
-    'books' => $pdo->query("SELECT COUNT(*) FROM ksiazki")->fetchColumn(),
-    'authors' => $pdo->query("SELECT COUNT(*) FROM autorzy")->fetchColumn(),
+    'bikes' => $pdo->query("SELECT COUNT(*) FROM rowery")->fetchColumn(),
+    'brands' => $pdo->query("SELECT COUNT(*) FROM marki")->fetchColumn(),
     'clients' => $pdo->query("SELECT COUNT(*) FROM klient")->fetchColumn(),
-    'borrowed' => $pdo->query("SELECT COUNT(*) FROM ksiazki WHERE id_klienta IS NOT NULL")->fetchColumn(),
-    'available' => $pdo->query("SELECT COUNT(*) FROM ksiazki WHERE id_klienta IS NULL")->fetchColumn()
+    'borrowed' => $pdo->query("SELECT COUNT(*) FROM rowery WHERE id_klienta IS NOT NULL")->fetchColumn(),
+    'available' => $pdo->query("SELECT COUNT(*) FROM rowery WHERE id_klienta IS NULL")->fetchColumn()
 ];
 
-// Pobranie listy książek z pełnymi danymi (JOIN)
+// Pobranie listy rowerów z pełnymi danymi (JOIN)
 $sql = "SELECT 
-            k.id_ksiazki, 
-            k.tytul,
-            a.imie AS autor_imie, 
-            a.nazwisko AS autor_nazwisko, 
+            r.id_roweru, 
+            r.model,
+            m.nazwa AS marka_nazwa, 
+            m.kraj AS marka_kraj, 
             kat.nazwa_kategori, 
-            p.numer_polki,
+            s.numer_stacji,
             kl.imie AS klient_imie, 
             kl.nazwisko AS klient_nazwisko
-        FROM ksiazki k
-        JOIN autorzy a ON k.id_autora = a.id_autora
-        JOIN kategorie kat ON k.id_kategori = kat.id_kategori
-        JOIN polki p ON k.id_polki = p.id_polki
-        LEFT JOIN klient kl ON k.id_klienta = kl.id_klienta
-        ORDER BY k.id_ksiazki DESC";
+        FROM rowery r
+        JOIN marki m ON r.id_marki = m.id_marki
+        JOIN kategorie kat ON r.id_kategori = kat.id_kategori
+        JOIN stacje s ON r.id_stacji = s.id_stacji
+        LEFT JOIN klient kl ON r.id_klienta = kl.id_klienta
+        ORDER BY r.id_roweru DESC";
 
 $stmt = $pdo->query($sql);
-$books = $stmt->fetchAll();
+$bikes = $stmt->fetchAll();
 ?>
 
 <div class="stats-grid">
     <div class="stat-card">
-        <div>Liczba Książek</div>
+        <div>Liczba Rowerów</div>
         <div class="stat-number">
-            <?= $stats['books'] ?>
+            <?= $stats['bikes'] ?>
         </div>
     </div>
     <div class="stat-card">
@@ -52,9 +52,9 @@ $books = $stmt->fetchAll();
         </div>
     </div>
     <div class="stat-card">
-        <div>Autorzy</div>
+        <div>Marki</div>
         <div class="stat-number">
-            <?= $stats['authors'] ?>
+            <?= $stats['brands'] ?>
         </div>
     </div>
     <div class="stat-card">
@@ -67,49 +67,49 @@ $books = $stmt->fetchAll();
 
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="margin: 0;">Lista Książek</h2>
-        <a href="add_book.php" class="btn btn-primary">+ Dodaj Książkę</a>
+        <h2 style="margin: 0;">Lista Rowerów</h2>
+        <a href="add_bike.php" class="btn btn-primary">+ Dodaj Rower</a>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Tytuł</th>
-                <th>Autor</th>
+                <th>Model</th>
+                <th>Marka</th>
                 <th>Kategoria</th>
-                <th>Półka</th>
+                <th>Stacja</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($books as $book): ?>
+            <?php foreach ($bikes as $bike): ?>
                 <tr>
                     <td>
-                        <?= $book['id_ksiazki'] ?>
+                        <?= $bike['id_roweru'] ?>
                     </td>
                     <td><strong>
-                            <?= htmlspecialchars($book['tytul']) ?>
+                            <?= htmlspecialchars($bike['model']) ?>
                         </strong></td>
                     <td>
-                        <?= htmlspecialchars($book['autor_imie'] . ' ' . $book['autor_nazwisko']) ?>
+                        <?= htmlspecialchars($bike['marka_nazwa']) ?> (<?= htmlspecialchars($bike['marka_kraj']) ?>)
                     </td>
                     <td><span
                             style="background: rgba(88, 166, 255, 0.15); color: #58a6ff; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem;">
-                            <?= htmlspecialchars($book['nazwa_kategori']) ?>
+                            <?= htmlspecialchars($bike['nazwa_kategori']) ?>
                         </span></td>
                     <td>Nr
-                        <?= $book['numer_polki'] ?>
+                        <?= $bike['numer_stacji'] ?>
                     </td>
                     <td>
-                        <?php if ($book['klient_imie']): ?>
-                            <span style="color: #da3633;">Wypożyczona</span>
+                        <?php if ($bike['klient_imie']): ?>
+                            <span style="color: #da3633;">Wypożyczony</span>
                             <div style="font-size: 0.8rem; color: #8b949e;">
                                 przez:
-                                <?= htmlspecialchars($book['klient_imie'] . ' ' . $book['klient_nazwisko']) ?>
+                                <?= htmlspecialchars($bike['klient_imie'] . ' ' . $bike['klient_nazwisko']) ?>
                             </div>
                         <?php else: ?>
-                            <span style="color: #238636;">Dostępna</span>
+                            <span style="color: #238636;">Dostępny</span>
                         <?php endif; ?>
                     </td>
                 </tr>

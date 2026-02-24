@@ -10,13 +10,13 @@ $editClient = null;
 if (isset($_GET['delete'])) {
     $id_do_usuniecia = $_GET['delete'];
     try {
-        // Sprawdź czy klient ma wypożyczone książki
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM ksiazki WHERE id_klienta = ?");
+        // Sprawdź czy klient ma wypożyczone rowery
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM rowery WHERE id_klienta = ?");
         $stmt->execute([$id_do_usuniecia]);
         $liczba_wypozyczen = $stmt->fetchColumn();
 
         if ($liczba_wypozyczen > 0) {
-            $message = '<div class="alert alert-error">Nie można usunąć klienta. Klient ma ' . $liczba_wypozyczen . ' aktywnych wypożyczeń. Najpierw zwróć wszystkie książki.</div>';
+            $message = '<div class="alert alert-error">Nie można usunąć klienta. Klient ma ' . $liczba_wypozyczen . ' aktywnych wypożyczeń. Najpierw zwróć wszystkie rowery.</div>';
         } else {
             $stmt = $pdo->prepare("DELETE FROM klient WHERE id_klienta = ?");
             $stmt->execute([$id_do_usuniecia]);
@@ -87,10 +87,10 @@ $klienci = $pdo->query("SELECT * FROM klient ORDER BY nazwisko")->fetchAll();
             <?php if ($editMode): ?>
                 <input type="hidden" name="id_klienta" value="<?= $editClient['id_klienta'] ?>">
             <?php endif; ?>
-            
+
             <div class="form-group">
                 <label for="imie">Imię</label>
-                <input type="text" id="imie" name="imie" required placeholder="Jan" 
+                <input type="text" id="imie" name="imie" required placeholder="Jan"
                     value="<?= $editMode ? htmlspecialchars($editClient['imie']) : '' ?>">
             </div>
             <div class="form-group">
@@ -103,10 +103,11 @@ $klienci = $pdo->query("SELECT * FROM klient ORDER BY nazwisko")->fetchAll();
                 <input type="email" id="email" name="email" required placeholder="jan@example.com"
                     value="<?= $editMode ? htmlspecialchars($editClient['adres_email']) : '' ?>">
             </div>
-            
+
             <?php if ($editMode): ?>
                 <div style="display: flex; gap: 10px;">
-                    <a href="clients.php" class="btn" style="flex: 1; text-align: center; text-decoration: none; color: #8b949e;">Anuluj</a>
+                    <a href="clients.php" class="btn"
+                        style="flex: 1; text-align: center; text-decoration: none; color: #8b949e;">Anuluj</a>
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Zapisz Zmiany</button>
                 </div>
             <?php else: ?>
@@ -140,10 +141,10 @@ $klienci = $pdo->query("SELECT * FROM klient ORDER BY nazwisko")->fetchAll();
                             <?= htmlspecialchars($klient['adres_email']) ?>
                         </td>
                         <td>
-                            <a href="clients.php?edit=<?= $klient['id_klienta'] ?>" style="color: #8b949e; margin-right: 10px;">Edytuj</a>
-                            <a href="clients.php?delete=<?= $klient['id_klienta'] ?>" 
-                               style="color: #da3633;"
-                               onclick="return confirm('Czy na pewno chcesz usunąć klienta <?= htmlspecialchars($klient['imie'] . ' ' . $klient['nazwisko']) ?>?');">Usuń</a>
+                            <a href="clients.php?edit=<?= $klient['id_klienta'] ?>"
+                                style="color: #8b949e; margin-right: 10px;">Edytuj</a>
+                            <a href="clients.php?delete=<?= $klient['id_klienta'] ?>" style="color: #da3633;"
+                                onclick="return confirm('Czy na pewno chcesz usunąć klienta <?= htmlspecialchars($klient['imie'] . ' ' . $klient['nazwisko']) ?>?');">Usuń</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

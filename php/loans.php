@@ -4,13 +4,13 @@ require_once 'templates/header.php';
 
 $message = '';
 
-// Obsługa zwrotu książki (GET)
+// Obsługa zwrotu roweru (GET)
 if (isset($_GET['return'])) {
-    $id_ksiazki = $_GET['return'];
+    $id_roweru = $_GET['return'];
     try {
-        $stmt = $pdo->prepare("UPDATE ksiazki SET id_klienta = NULL WHERE id_ksiazki = ?");
-        $stmt->execute([$id_ksiazki]);
-        $message = '<div class="alert alert-success">Książka została zwrócona.</div>';
+        $stmt = $pdo->prepare("UPDATE rowery SET id_klienta = NULL WHERE id_roweru = ?");
+        $stmt->execute([$id_roweru]);
+        $message = '<div class="alert alert-success">Rower został zwrócony.</div>';
     } catch (PDOException $e) {
         $message = '<div class="alert alert-error">Błąd: ' . $e->getMessage() . '</div>';
     }
@@ -18,29 +18,29 @@ if (isset($_GET['return'])) {
 
 // Obsługa wypożyczenia (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_ksiazki = $_POST['id_ksiazki'];
+    $id_roweru = $_POST['id_roweru'];
     $id_klienta = $_POST['id_klienta'];
 
-    if ($id_ksiazki && $id_klienta) {
+    if ($id_roweru && $id_klienta) {
         try {
-            $stmt = $pdo->prepare("UPDATE ksiazki SET id_klienta = ? WHERE id_ksiazki = ?");
-            $stmt->execute([$id_klienta, $id_ksiazki]);
-            $message = '<div class="alert alert-success">Książka została wypożyczona.</div>';
+            $stmt = $pdo->prepare("UPDATE rowery SET id_klienta = ? WHERE id_roweru = ?");
+            $stmt->execute([$id_klienta, $id_roweru]);
+            $message = '<div class="alert alert-success">Rower został wypożyczony.</div>';
         } catch (PDOException $e) {
             $message = '<div class="alert alert-error">Błąd: ' . $e->getMessage() . '</div>';
         }
     } else {
-        $message = '<div class="alert alert-error">Proszę wybrać książkę i klienta.</div>';
+        $message = '<div class="alert alert-error">Proszę wybrać rower i klienta.</div>';
     }
 }
 
-// Pobranie dostępnych książek
-$available_books = $pdo->query("
-    SELECT k.id_ksiazki, k.tytul, a.imie, a.nazwisko 
-    FROM ksiazki k 
-    JOIN autorzy a ON k.id_autora = a.id_autora 
-    WHERE k.id_klienta IS NULL 
-    ORDER BY k.tytul
+// Pobranie dostępnych rowerów
+$available_bikes = $pdo->query("
+    SELECT r.id_roweru, r.model, m.nazwa AS marka_nazwa 
+    FROM rowery r 
+    JOIN marki m ON r.id_marki = m.id_marki 
+    WHERE r.id_klienta IS NULL 
+    ORDER BY r.model
 ")->fetchAll();
 
 // Pobranie klientów
@@ -48,11 +48,11 @@ $clients = $pdo->query("SELECT id_klienta, imie, nazwisko FROM klient ORDER BY n
 
 // Pobranie aktualnych wypożyczeń
 $loans = $pdo->query("
-    SELECT k.id_ksiazki, k.tytul, a.imie AS a_imie, a.nazwisko AS a_nazwisko, kl.imie AS kl_imie, kl.nazwisko AS kl_nazwisko 
-    FROM ksiazki k 
-    JOIN autorzy a ON k.id_autora = a.id_autora 
-    JOIN klient kl ON k.id_klienta = kl.id_klienta 
-    ORDER BY k.id_ksiazki DESC
+    SELECT r.id_roweru, r.model, m.nazwa AS marka_nazwa, kl.imie AS kl_imie, kl.nazwisko AS kl_nazwisko 
+    FROM rowery r 
+    JOIN marki m ON r.id_marki = m.id_marki 
+    JOIN klient kl ON r.id_klienta = kl.id_klienta 
+    ORDER BY r.id_roweru DESC
 ")->fetchAll();
 ?>
 
@@ -62,15 +62,15 @@ $loans = $pdo->query("
 
     <!-- Formularz Wypożyczania -->
     <div class="card">
-        <h3>Wypożycz Książkę</h3>
+        <h3>Wypożycz Rower</h3>
         <form method="POST" action="loans.php">
             <div class="form-group">
-                <label for="id_ksiazki">Książka (dostępne)</label>
-                <select id="id_ksiazki" name="id_ksiazki" required>
-                    <option value="">-- Wybierz książkę --</option>
-                    <?php foreach ($available_books as $book): ?>
-                        <option value="<?= $book['id_ksiazki'] ?>">
-                            <?= htmlspecialchars($book['tytul'] . ' - ' . $book['imie'] . ' ' . $book['nazwisko']) ?>
+                <label for="id_roweru">Rower (dostępne)</label>
+                <select id="id_roweru" name="id_roweru" required>
+                    <option value="">-- Wybierz rower --</option>
+                    <?php foreach ($available_bikes as $bike): ?>
+                        <option value="<?= $bike['id_roweru'] ?>">
+                            <?= htmlspecialchars($bike['model'] . ' - ' . $bike['marka_nazwa']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -98,7 +98,7 @@ $loans = $pdo->query("
         <table>
             <thead>
                 <tr>
-                    <th>Książka</th>
+                    <th>Rower</th>
                     <th>Klient</th>
                     <th>Akcje</th>
                 </tr>
@@ -113,19 +113,19 @@ $loans = $pdo->query("
                         <tr>
                             <td>
                                 <strong>
-                                    <?= htmlspecialchars($loan['tytul']) ?>
+                                    <?= htmlspecialchars($loan['model']) ?>
                                 </strong><br>
                                 <small style="color: #8b949e;">
-                                    <?= htmlspecialchars($loan['a_imie'] . ' ' . $loan['a_nazwisko']) ?>
+                                    Marka: <?= htmlspecialchars($loan['marka_nazwa']) ?>
                                 </small>
                             </td>
                             <td>
                                 <?= htmlspecialchars($loan['kl_imie'] . ' ' . $loan['kl_nazwisko']) ?>
                             </td>
                             <td>
-                                <a href="loans.php?return=<?= $loan['id_ksiazki'] ?>" class="btn btn-success"
+                                <a href="loans.php?return=<?= $loan['id_roweru'] ?>" class="btn btn-success"
                                     style="padding: 4px 10px; font-size: 0.8rem;"
-                                    onclick="return confirm('Czy na pewno chcesz zwrócić tę książkę?');">Zwróć</a>
+                                    onclick="return confirm('Czy na pewno chcesz zwrócić ten rower?');">Zwróć</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -133,6 +133,8 @@ $loans = $pdo->query("
             </tbody>
         </table>
     </div>
+
+</div>
 
 </div>
 

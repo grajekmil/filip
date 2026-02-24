@@ -1,15 +1,15 @@
-# Dokumentacja Zapytań SQL dla Systemu Bibliotecznego
+# Dokumentacja Zapytań SQL dla Systemu Wypożyczalni Rowerów
 
-Niniejszy dokument zawiera szczegółowy opis przykładowych zapytań SQL (CRUD) wykorzystywanych w systemie bibliotecznym. Zapytania te obejmują pobieranie danych (SELECT), dodawanie nowych rekordów (INSERT), a także aktualizację (UPDATE) i usuwanie (DELETE).
+Niniejszy dokument zawiera szczegółowy opis przykładowych zapytań SQL (CRUD) wykorzystywanych w systemie wypożyczalni rowerów. Zapytania te obejmują pobieranie danych (SELECT), dodawanie nowych rekordów (INSERT), a także aktualizację (UPDATE) i usuwanie (DELETE).
 
 ## 1. Struktura Danych - Krótki Przegląd
 
 System opiera się na relacyjnej bazie danych zawierającej następujące tabele:
-*   **autorzy**: Przechowuje dane o autorach (imie, nazwisko).
-*   **kategorie**: Przechowuje kategorie książek (np. poezja, dramat).
-*   **polki**: Numeracja fizycznych półek w bibliotece.
-*   **klient**: Dane czytelników (imie, nazwisko, email).
-*   **ksiazki**: Główna tabela łącząca pozostałe. Zawiera klucze obce do autorów, kategorii, półek oraz (opcjonalnie) klienta, który wypożyczył książkę.
+*   **marki**: Przechowuje dane o markach rowerów (nazwa, kraj).
+*   **kategorie**: Przechowuje kategorie rowerów (np. Górski, Miejski).
+*   **stacje**: Numeracja fizycznych stacji (punktów odbioru/zwrotu).
+*   **klient**: Dane klientów (imie, nazwisko, email).
+*   **rowery**: Główna tabela łącząca pozostałe. Zawiera klucze obce do marek, kategorii, stacji oraz (opcjonalnie) klienta, który wypożyczył rower.
 
 ---
 
@@ -17,58 +17,57 @@ System opiera się na relacyjnej bazie danych zawierającej następujące tabele
 
 Zapytania `SELECT` służą do pobierania danych z bazy.
 
-### 2.1. Pobranie wszystkich autorów
-Pobiera pełną listę autorów zapisanych w bazie.
+### 2.1. Pobranie wszystkich marek
+Pobiera pełną listę marek zapisanych w bazie.
 ```sql
-SELECT * FROM autorzy;
+SELECT * FROM marki;
 ```
 
 ### 2.2. Pobranie wszystkich kategorii
-Wyświetla dostępne kategorie książek.
+Wyświetla dostępne kategorie rowerów.
 ```sql
 SELECT * FROM kategorie;
 ```
 
-### 2.3. Raport o książkach (Złączenia / JOIN)
-To zapytanie jest kluczowe dla widoku użytkownika. Zamiast wyświetlać numery ID (np. `id_autora=1`), łączy dane z powiązanych tabel, aby wyświetlić czytelne informacje: tytuł, imię i nazwisko autora, nazwę kategorii, numer półki oraz dane osoby wypożyczającej (jeśli książka jest wypożyczona).
+### 2.3. Raport o rowerach (Złączenia / JOIN)
+To zapytanie jest kluczowe dla widoku użytkownika. Zamiast wyświetlać numery ID (np. `id_marki=1`), łączy dane z powiązanych tabel, aby wyświetlić czytelne informacje: model, nazwę marki, nazwę kategorii, numer stacji oraz dane osoby wypożyczającej (jeśli rower jest wypożyczony).
 
 **Zastosowane złączenia:**
-*   `JOIN` (Inner Join): Wyświetla książkę tylko, jeśli ma przypisanego autora, kategorię i półkę (jest to wymuszone strukturą NOT NULL w bazie).
-*   `LEFT JOIN` (dla tabeli `klient`): Pozwala wyświetlić książkę nawet jeśli **nie jest** ona wypożyczona (wtedy pole `id_klienta` jest NULL, a dane klienta również zwrócą NULL). Gdybyśmy użyli tutaj zwykłego JOIN, zapytanie zwróciłoby tylko wypożyczone książki.
+*   `JOIN` (Inner Join): Wyświetla rower tylko, jeśli ma przypisaną markę, kategorię i stację.
+*   `LEFT JOIN` (dla tabeli `klient`): Pozwala wyświetlić rower nawet jeśli **nie jest** on wypożyczony.
 
 ```sql
 SELECT 
-    k.id_ksiazki, 
-    k.tytul,
-    a.imie AS autor_imie, 
-    a.nazwisko AS autor_nazwisko, 
+    r.id_roweru, 
+    r.model,
+    m.nazwa AS marka_nazwa, 
     kat.nazwa_kategori, 
-    p.numer_polki,
+    s.numer_stacji,
     kl.imie AS klient_imie, 
     kl.nazwisko AS klient_nazwisko
-FROM ksiazki k
-JOIN autorzy a ON k.id_autora = a.id_autora
-JOIN kategorie kat ON k.id_kategori = kat.id_kategori
-JOIN polki p ON k.id_polki = p.id_polki
-LEFT JOIN klient kl ON k.id_klienta = kl.id_klienta;
+FROM rowery r
+JOIN marki m ON r.id_marki = m.id_marki
+JOIN kategorie kat ON r.id_kategori = kat.id_kategori
+JOIN stacje s ON r.id_stacji = s.id_stacji
+LEFT JOIN klient kl ON r.id_klienta = kl.id_klienta;
 ```
 
 ### 2.4. Historia wypożyczeń klienta
-Znajduje wszystkie książki aktualnie przypisane do klienta o `id_klienta = 1`.
+Znajduje wszystkie rowery aktualnie przypisane do klienta o `id_klienta = 1`.
 ```sql
-SELECT * FROM ksiazki WHERE id_klienta = 1;
+SELECT * FROM rowery WHERE id_klienta = 1;
 ```
 
-### 2.5. Wyszukiwanie książek (LIKE)
-Wyszukuje książki, których tytuł zawiera frazę "Dziady". Znak procenta `%` oznacza "dowolny ciąg znaków", więc znajdzie np. "Dziady cz.III", "Stare Dziady" itp.
+### 2.5. Wyszukiwanie rowerów (LIKE)
+Wyszukuje rowery, których model zawiera frazę "Roam".
 ```sql
-SELECT * FROM ksiazki WHERE tytul LIKE '%Dziady%';
+SELECT * FROM rowery WHERE model LIKE '%Roam%';
 ```
 
 ### 2.6. Sprawdzenie dostępności
-Wyświetla książki, które nie są aktualnie wypożyczone (pole `id_klienta` jest puste).
+Wyświetla rowery, które nie są aktualnie wypożyczone.
 ```sql
-SELECT * FROM ksiazki WHERE id_klienta IS NULL;
+SELECT * FROM rowery WHERE id_klienta IS NULL;
 ```
 
 ---
@@ -77,43 +76,33 @@ SELECT * FROM ksiazki WHERE id_klienta IS NULL;
 
 Służą do wstawiania nowych rekordów.
 
-### 3.1. Dodanie autora
+### 3.1. Dodanie marki
 ```sql
-INSERT INTO autorzy (imie, nazwisko) VALUES ('Juliusz', 'Słowacki');
+INSERT INTO marki (nazwa, kraj) VALUES ('Giant', 'Tajwan');
 ```
 
-### 3.2. Dodanie kategorii
+### 3.4. Dodanie stacji
 ```sql
-INSERT INTO kategorie (nazwa_kategori) VALUES ('biografia');
+INSERT INTO stacje (numer_stacji) VALUES (9);
 ```
 
-### 3.3. Dodanie klienta
+### 3.5. Dodanie roweru
+Podczas dodawania roweru musimy podać ID istniejącej marki, stacji i kategorii.
 ```sql
-INSERT INTO klient (imie, nazwisko, adres_email) VALUES ('Anna', 'Nowak', 'anna.nowak@example.com');
+INSERT INTO rowery (id_marki, id_stacji, id_kategori, model, id_klienta) 
+VALUES (1, 1, 1, 'Roam 1', NULL);
 ```
 
-### 3.4. Dodanie półki
-```sql
-INSERT INTO polki (numer_polki) VALUES (9);
-```
-
-### 3.5. Dodanie książki
-Podczas dodawania książki musimy podać ID istniejącego autora, półki i kategorii. Ostatni parametr (`NULL`) oznacza, że nowa książka nie jest od razu wypożyczona.
-```sql
-INSERT INTO ksiazki (id_autora, id_polki, id_kategori, tytul, id_klienta) 
-VALUES (1, 1, 1, 'Pan Tadeusz', NULL);
-```
-
-### 3.6. Dodanie książki "słownie" (ZAAWANSOWANE)
-Możemy pójść o krok dalej i dodać książkę nie znając **żadnego** ID, opierając się tylko na nazwach (Autora, Kategorii i numerze Półki). To bardzo przydatne przy imporcie danych z Excela/CSV, gdzie zazwyczaj mamy nazwy, a nie ID.
+### 3.6. Dodanie roweru "słownie" (ZAAWANSOWANE)
+Możemy pójść o krok dalej i dodać rower nie znając **żadnego** ID, opierając się tylko na nazwach.
 
 ```sql
-INSERT INTO ksiazki (id_autora, id_polki, id_kategori, tytul, id_klienta)
+INSERT INTO rowery (id_marki, id_stacji, id_kategori, model, id_klienta)
 VALUES (
-    (SELECT id_autora FROM autorzy WHERE imie = 'Adam' AND nazwisko = 'Mickiewicz' LIMIT 1), 
-    (SELECT id_polki FROM polki WHERE numer_polki = 1 LIMIT 1),
-    (SELECT id_kategori FROM kategorie WHERE nazwa_kategori = 'poezja' LIMIT 1),
-    'Konrad Wallenrod',
+    (SELECT id_marki FROM marki WHERE nazwa = 'Giant' LIMIT 1), 
+    (SELECT id_stacji FROM stacje WHERE numer_stacji = 1 LIMIT 1),
+    (SELECT id_kategori FROM kategorie WHERE nazwa_kategori = 'Górski' LIMIT 1),
+    'Roam 1',
     NULL
 );
 ```
@@ -125,16 +114,16 @@ VALUES (
 
 Służą do modyfikacji istniejących wpisów, np. przy procesie wypożyczania.
 
-### 4.1. Wypożyczenie książki
-Przypisuje użytkownika o ID 2 do książki o ID 3.
+### 4.1. Wypożyczenie roweru
+Przypisuje użytkownika o ID 2 do roweru o ID 3.
 ```sql
-UPDATE ksiazki SET id_klienta = 2 WHERE id_ksiazki = 3;
+UPDATE rowery SET id_klienta = 2 WHERE id_roweru = 3;
 ```
 
-### 4.2. Zwrot książki
-Usuwa przypisanie użytkownika (ustawia NULL).
+### 4.2. Zwrot roweru
+Usuwa przypisanie użytkownika.
 ```sql
-UPDATE ksiazki SET id_klienta = NULL WHERE id_ksiazki = 3;
+UPDATE rowery SET id_klienta = NULL WHERE id_roweru = 3;
 ```
 
 ### 4.3. Zmiana danych klienta
@@ -147,75 +136,72 @@ UPDATE klient SET adres_email = 'nowy.email@example.com' WHERE id_klienta = 1;
 
 ## 5. Zapytania DELETE (Usuwanie Danych)
 
-### 5.1. Usunięcie książki
-Usuwa fizycznie rekord książki z bazy.
+### 5.1. Usunięcie roweru
+Usuwa rekord roweru z bazy.
 ```sql
-DELETE FROM ksiazki WHERE id_ksiazki = 5;
+DELETE FROM rowery WHERE id_roweru = 5;
 ```
 
-### 5.2. Usunięcie autora
-**Uwaga:** Jeśli autor ma przypisane książki, baza danych może zablokować usunięcie (constraint violation), aby nie pozostawić "sierot" w tabeli książek. Aby usunąć takiego autora, należy najpierw usunąć jego książki lub zmienić im autora.
+### 5.2. Usunięcie marki
 ```sql
-DELETE FROM autorzy WHERE id_autora = 5;
+DELETE FROM marki WHERE id_marki = 5;
 ```
 
 ---
 
 ## 6. Procedura "Smart Insert" (Automatyzacja)
 
-Pytasz, czy da się dodać książkę, podając autora, którego jeszcze nie ma w bazie, tak aby SQL sam go dodał?
+Pytasz, czy da się dodać rower, podając markę, której jeszcze nie ma w bazie, tak aby SQL sam ją dodał?
 **Tak, ale wymaga to Procedury Składowanej (Stored Procedure).**
 
-Standardowe polecenie `INSERT` działa tylko na jednej tabeli naraz. Aby zrobić "logikę" (sprawdź -> jeśli nie ma to dodaj -> potem dodaj książkę), musimy napisać mały program w SQL (procedurę).
+Standardowe polecenie `INSERT` działa tylko na jednej tabeli naraz. Aby zrobić "logikę" (sprawdź -> jeśli nie ma to dodaj -> potem dodaj rower), musimy napisać mały program w SQL (procedurę).
 
 ### 6.1. Jak używać?
-Po wgraniu procedury do bazy, dodawanie książek z automatycznym tworzeniem autora wygląda tak:
+Po wgraniu procedury do bazy, dodawanie rowerów z automatycznym tworzeniem marki wygląda tak:
 ```sql
-CALL DodajKsiazkeZAutorem('Wisława', 'Szymborska', 'Wiersze', 2, 'poezja');
+CALL DodajRowerZMarka('Giant', 'Tajwan', 'Roam 1', 2, 'Górski');
 ```
 Parametry (kolejno):
-1.  **Imię autora** (`'Wisława'`)
-2.  **Nazwisko autora** (`'Szymborska'`)
-3.  **Tytuł książki** (`'Wiersze'`)
-4.  **Numer półki** (`2`)
-5.  **Nazwa kategorii** (`'poezja'`)
+1.  **Nazwa marki** (`'Giant'`)
+2.  **Kraj marki** (`'Tajwan'`)
+3.  **Model roweru** (`'Roam 1'`)
+4.  **Numer stacji** (`2`)
+5.  **Nazwa kategorii** (`'Górski'`)
 
 ### 6.2. Kod źródłowy procedury
-Poniżej znajduje się pełny kod procedury, który wykonuje całą logikę (do skopiowania, jeśli nie chcesz używać osobnego pliku `.sql`):
-
 ```sql
 DELIMITER //
 
-CREATE PROCEDURE DodajKsiazkeZAutorem(
-    IN p_imie_autora VARCHAR(15),
-    IN p_nazwisko_autora VARCHAR(20),
-    IN p_tytul VARCHAR(20),
-    IN p_numer_polki INT,
+CREATE PROCEDURE DodajRowerZMarka(
+    IN p_nazwa_marki VARCHAR(15),
+    IN p_kraj_marki VARCHAR(20),
+    IN p_model VARCHAR(20),
+    IN p_numer_stacji INT,
     IN p_nazwa_kategorii VARCHAR(40)
 )
 BEGIN
-    DECLARE v_id_autora INT;
-    DECLARE v_id_polki INT;
+    DECLARE v_id_marki INT;
+    DECLARE v_id_stacji INT;
     DECLARE v_id_kategorii INT;
 
-    -- 1. Sprawdź czy autor istnieje, jeśli nie - dodaj go
-    SELECT id_autora INTO v_id_autora FROM autorzy 
-    WHERE imie = p_imie_autora AND nazwisko = p_nazwisko_autora LIMIT 1;
+    -- 1. Sprawdź czy marka istnieje
+    SELECT id_marki INTO v_id_marki FROM marki 
+    WHERE nazwa = p_nazwa_marki LIMIT 1;
     
-    IF v_id_autora IS NULL THEN
-        INSERT INTO autorzy (imie, nazwisko) VALUES (p_imie_autora, p_nazwisko_autora);
-        SET v_id_autora = LAST_INSERT_ID();
+    IF v_id_marki IS NULL THEN
+        INSERT INTO marki (nazwa, kraj) VALUES (p_nazwa_marki, p_kraj_marki);
+        SET v_id_marki = LAST_INSERT_ID();
     END IF;
 
-    -- 2. Sprawdź czy półka istnieje, jeśli nie - dodaj ją
-    SELECT id_polki INTO v_id_polki FROM polki WHERE numer_polki = p_numer_polki LIMIT 1;
+    -- 2. Sprawdź czy stacja istnieje
+    SELECT id_stacji INTO v_id_stacji FROM stacje WHERE numer_stacji = p_numer_stacji LIMIT 1;
 
-    IF v_id_polki IS NULL THEN
-        INSERT INTO polki (numer_polki) VALUES (p_numer_polki);
-        SET v_id_polki = LAST_INSERT_ID();
+    IF v_id_stacji IS NULL THEN
+        INSERT INTO stacje (numer_stacji) VALUES (p_numer_stacji);
+        SET v_id_stacji = LAST_INSERT_ID();
     END IF;
     
-    -- 3. Sprawdź czy kategoria istnieje, jeśli nie - dodaj ją
+    -- 3. Sprawdź czy kategoria istnieje
     SELECT id_kategori INTO v_id_kategorii FROM kategorie WHERE nazwa_kategori = p_nazwa_kategorii LIMIT 1;
 
     IF v_id_kategorii IS NULL THEN
@@ -223,9 +209,9 @@ BEGIN
         SET v_id_kategorii = LAST_INSERT_ID();
     END IF;
 
-    -- 4. Wstaw książkę
-    INSERT INTO ksiazki (id_autora, id_polki, id_kategori, tytul, id_klienta)
-    VALUES (v_id_autora, v_id_polki, v_id_kategorii, p_tytul, NULL);
+    -- 4. Wstaw rower
+    INSERT INTO rowery (id_marki, id_stacji, id_kategori, model, id_klienta)
+    VALUES (v_id_marki, v_id_stacji, v_id_kategorii, p_model, NULL);
     
 END //
 

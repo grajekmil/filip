@@ -1,6 +1,6 @@
-# System Biblioteczny (PHP + MySQL)
+# System Wypożyczalni Rowerów (PHP + MySQL)
 
-Prosty system CRUD do zarządzania biblioteką, napisany w czystym PHP bez użycia frameworków.
+Prosty system CRUD do zarządzania wypożyczalnią rowerów, napisany w czystym PHP bez użycia frameworków.
 
 ## 🚀 Jak uruchomić?
 
@@ -9,13 +9,13 @@ Prosty system CRUD do zarządzania biblioteką, napisany w czystym PHP bez użyc
 *   Baza danych MySQL/MariaDB
 
 ### Konfiguracja
-1.  Upewnij się, że masz importowaną bazę danych `biblioteka`.
-    *   Plik SQL: `../biblioteka.sql`
+1.  Upewnij się, że masz importowaną bazę danych `rent_rowery`.
+    *   Plik SQL: `../rent_rowery.sql`
     *   Procedura (opcjonalnie): `../procedura_smart_insert.sql`
 2.  Sprawdź ustawienia połączenia w pliku `config.php`:
     ```php
     $host = 'localhost';
-    $dbname = 'biblioteka';
+    $dbname = 'rent_rowery';
     $username = 'root';
     $password = '';
     ```
