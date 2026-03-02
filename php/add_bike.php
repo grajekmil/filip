@@ -57,7 +57,8 @@ $stacje = $pdo->query("SELECT * FROM stacje ORDER BY numer_stacji")->fetchAll();
             <datalist id="marki_list">
                 <?php foreach ($marki as $marka): ?>
                     <option value="<?= htmlspecialchars($marka['full_name']) ?>">
-                        <?= htmlspecialchars($marka['full_name']) ?></option>
+                        <?= htmlspecialchars($marka['full_name']) ?>
+                    </option>
                 <?php endforeach; ?>
             </datalist>
             <small style="color: #8b949e; display: block; margin-top: 5px;">Wpisz nazwę marki i kraj oddzielone
@@ -71,7 +72,8 @@ $stacje = $pdo->query("SELECT * FROM stacje ORDER BY numer_stacji")->fetchAll();
             <datalist id="kategorie_list">
                 <?php foreach ($kategorie as $kategoria): ?>
                     <option value="<?= htmlspecialchars($kategoria['nazwa_kategori']) ?>">
-                        <?= htmlspecialchars($kategoria['nazwa_kategori']) ?></option>
+                        <?= htmlspecialchars($kategoria['nazwa_kategori']) ?>
+                    </option>
                 <?php endforeach; ?>
             </datalist>
             <small style="color: #8b949e; display: block; margin-top: 5px;">Wybierz z listy lub wpisz nową
@@ -85,7 +87,8 @@ $stacje = $pdo->query("SELECT * FROM stacje ORDER BY numer_stacji")->fetchAll();
             <datalist id="stacje_list">
                 <?php foreach ($stacje as $stacja): ?>
                     <option value="<?= htmlspecialchars($stacja['numer_stacji']) ?>">Stacja nr
-                        <?= htmlspecialchars($stacja['numer_stacji']) ?></option>
+                        <?= htmlspecialchars($stacja['numer_stacji']) ?>
+                    </option>
                 <?php endforeach; ?>
             </datalist>
             <small style="color: #8b949e; display: block; margin-top: 5px;">Wybierz z listy lub wpisz nowy
